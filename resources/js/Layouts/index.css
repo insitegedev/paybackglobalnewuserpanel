@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    scroll-behavior: smooth;
+}
+
+body {
+    color: #08122b;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+input[type="file"],
+textarea,
+select {
+    background-color: #f5f5f5;
+    padding-left: 20px;
+    width: 100%;
+    border-radius: 3px;
+    margin-bottom: 1rem;
+    height: 46px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+    position: relative;
+}
+
+input:focus,
+textarea:focus {
+    box-shadow: 0 0 2px 2px #747dd17e;
+}
+
+input[type="file"] {
+    padding-top: 9px;
+}
+
+input[type="file"]::after {
+    content: "Choose File";
+    position: absolute;
+    left: 17px;
+    width: 90px;
+    height: 38px;
+    top: 4px;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+textarea {
+    height: 90px;
+    margin-bottom: 25px;
+    padding-top: 10px;
+}
+
+p {
+    text-align: justify;
+}
+.wrapper {
+    width: 1290px;
+    margin: auto;
+    height: 100%;
+}
+
+.aboutPage .mainFormBox {
+    margin: auto;
+}
+
+.gradient {
+    background: linear-gradient(to right, #e3dafb59, #e8fbfc63);
+}
+
+.accountPage::before {
+    position: absolute;
+    content: "";
+    left: 0;
+    top: 0;
+    background-color: #f5f5f5;
+    width: 26%;
+    height: 100%;
+    z-index: -1;
+}
+
+@media screen and (max-width: 1350px) {
+    .wrapper {
+        width: 95%;
+    }
+}

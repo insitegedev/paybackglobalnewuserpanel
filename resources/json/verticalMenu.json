@@ -1,0 +1,140 @@
+{
+    "menu": [
+        {
+            "url": "javascript:void(0)",
+            "name": "Client Management",
+            "i18n": "user",
+            "icon": "brightness_low",
+            "slug": "user",
+            "submenu": [
+                {
+                    "url": "user.index",
+                    "name": "Clients",
+                    "i18n": "Clients",
+                    "icon": "user",
+                    "slug": "user"
+                },
+                {
+                    "url": "currency.index",
+                    "name": "Currencies",
+                    "i18n": "subs",
+                    "icon": "g_subs",
+                    "slug": "currency"
+                },
+                {
+                    "url": "session.index",
+                    "name": "Sessions",
+                    "i18n": "change_password",
+                    "icon": "brightness_low",
+                    "slug": "session"
+                }
+            ]
+        },
+        {
+            "url": "setting.index",
+            "name": "Settings",
+            "i18n": "setting",
+            "icon": "language",
+            "slug": "setting"
+        },
+        {
+            "url": "javascript:void(0)",
+            "name": "Language Management",
+            "i18n": "language",
+            "icon": "language",
+            "slug": "language",
+            "submenu": [
+                {
+                    "url": "translation.index",
+                    "name": "Translations",
+                    "i18n": "translation",
+                    "icon": "g_translate",
+                    "slug": "translation"
+                },
+                {
+                    "url": "language.index",
+                    "name": "Languages",
+                    "i18n": "language",
+                    "icon": "language",
+                    "slug": "language"
+                }
+            ]
+        },
+        {
+            "url": "javascript:void(0)",
+            "name": "Email Settings",
+            "i18n": "moderator",
+            "icon": "brightness_low",
+            "slug": "moderator",
+            "submenu": [
+                {
+                    "url": "mailer.index",
+                    "name": "Mailer Settings",
+                    "i18n": "mailer",
+                    "icon": "settings",
+                    "slug": "mailer"
+                },
+                {
+                    "url": "mail.index",
+                    "name": "Email Texts",
+                    "i18n": "mail",
+                    "icon": "mail",
+                    "slug": "mail"
+                }
+            ]
+        },
+        {
+            "url": "javascript:void(0)",
+            "name": "Administrative",
+            "i18n": "moderator",
+            "icon": "brightness_low",
+            "slug": "moderator",
+            "submenu": [
+                {
+                    "url": "moderator.index",
+                    "name": "Moderators",
+                    "i18n": "moderator",
+                    "icon": "brightness_low",
+                    "slug": "moderator"
+                },
+                {
+                    "url": "change-password",
+                    "name": "Change Password",
+                    "i18n": "change_password",
+                    "icon": "brightness_low",
+                    "slug": "change password"
+                },
+                {
+                    "url": "log.index",
+                    "name": "Log",
+                    "i18n": "log",
+                    "icon": "log",
+                    "slug": "log"
+                },
+                {
+                    "url": "archive.index",
+                    "name": "Archive",
+                    "i18n": "archive",
+                    "icon": "archive",
+                    "slug": "archive"
+                }
+            ]
+        },
+        {
+            "url": "logout",
+            "name": "Log Out",
+            "i18n": "logout",
+            "icon": "logout",
+            "slug": "logout"
+        }
+    ],
+    "_comment": [
+        {
+            "url": "setting.index",
+            "name": "setting",
+            "i18n": "setting",
+            "icon": "brightness_low",
+            "slug": "setting"
+        }
+    ]
+}
