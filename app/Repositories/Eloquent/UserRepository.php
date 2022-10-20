@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  app/Repositories/Eloquent/ProjectRepository.php
  *
@@ -38,13 +39,17 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
 
     public function create(array $attributes = [])
     {
-        //dd($attributes);
-        $attributes['balance'] = '0';
-        $attributes['crypto_address'] = '0';
+        // dd($attributes);
+        if (isset($attributes['balance'])) {
+            $attributes['balance'] = json_encode($attributes['balance']);
+        }
+        if (isset($attributes['crypto_address'])) {
+            $attributes['crypto_address'] = json_encode($attributes['crypto_address']);
+        }
         $attributes['password'] = Hash::make($attributes['password']);
 
         $attributes['is_send_email'] = isset($attributes['is_send_email']) ?? 0;
-        $attributes['verification_proggress'] = '';
+        $attributes['can_withdraw'] = isset($attributes['can_withdraw']) ?? 0;
 
         $userAttributes = Arr::except($attributes, ['name', 'surname', 'phone']);
 
@@ -65,7 +70,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                 'name' => \auth()->user()->profile ? \auth()->user()->profile->name : '',
                 'surname' => \auth()->user()->profile ? \auth()->user()->profile->surname : '',
                 'action' => 'create',
-                'details' => 'Created user: '. $user->email
+                'details' => 'Created user: ' . $user->email
             ]);
             $log->save();
 
@@ -83,7 +88,6 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
 
 
             return $user;
-
         } catch (\Illuminate\Database\QueryException $exception) {
             dd($exception->getMessage());
             return $exception->errorInfo;
@@ -93,6 +97,15 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     public function update(int $id, array $data = [])
     {
 
+        global $request;
+        function checkMail()
+        {
+            if ($GLOBALS['request']->email_verified_at == 'null') {
+                return null;
+            } else {
+                return $GLOBALS['request']->email_verified_at;
+            }
+        }
         $this->model = $this->findOrFail($id);
 
         $data['balance'] = json_encode(isset($data['balance']) ? $data['balance'] : []);
@@ -104,7 +117,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         }
 
         $data['is_send_email'] = isset($data['is_send_email']) ?? 0;
-
+        $data['can_withdraw'] = isset($data['can_withdraw']) ?? 0;
 
         try {
             $this->model->profile->update([
@@ -114,10 +127,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             ]);
 
             $mail = \App\Models\Mail::first();
-            //dd($data);
-//
             if ($data['status'] !== $this->model->getOriginal('status') && ($data['status'] == 'approved' || $data['status'] == 'rejected') && $data['is_send_email']) {
-                if($data['status'] == 'rejected'){
+                if ($data['status'] == 'rejected') {
                     $sendData = [
                         'name' => $this->model->profile->name,
                         'subject' => 'Your Status is Changed',
@@ -126,7 +137,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                         'text' => $mail->status_reject
                     ];
                 }
-                if($data['status'] == 'approved'){
+                if ($data['status'] == 'approved') {
                     $sendData = [
                         'name' => $this->model->profile->name,
                         'subject' => 'Your Status is Changed',
@@ -154,7 +165,5 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         } catch (\Illuminate\Database\QueryException $exception) {
             return $exception->errorInfo;
         }
-
     }
-
 }

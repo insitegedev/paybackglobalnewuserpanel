@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous"> -->
-{{--    <title>{{$meta_title}}</title>--}}
+<title>Blockchain Investigations</title>
 {{--    <meta name="description"--}}
 {{--          content="{{ $meta_description }}">--}}
 {{--    <meta name="keywords" content="{{ $meta_keyword }}">--}}
@@ -17,6 +17,7 @@
     <meta property="og:url" content="{{ request()->fullUrl() }}">
     <meta property="og:type" content="page">
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('Layouts/index.css') }}" rel="stylesheet"/>
 {{--    @if(app()->getLocale()=="ge")--}}
 {{--        <link href="{{ mix('/css/AppGeo.css') }}" rel="stylesheet"/>--}}
 {{--    @elseif(app()->getLocale()=="en")--}}
@@ -67,34 +68,18 @@ window.smartsupp||(function(d) {
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
 </script>
-
 <script>
-    // let sharedData = {!! json_encode($page["props"]["localizations"]??null) !!};
-    // function __(key, replace = {}) {
-    //     let translation = sharedData?sharedData[key] || key : key;
+    let sharedData = {!! json_encode($page["props"]["localizations"]??null) !!};
+    function __(key, replace = {}) {
+        let translation = sharedData?sharedData[key] || key : key;
 
-    //     Object.keys(replace).forEach(function (key) {
-    //         translation = translation.replace(":" + key, replace[key]);
-    //     });
+        Object.keys(replace).forEach(function (key) {
+            translation = translation.replace(":" + key, replace[key]);
+        });
 
-    //     return translation;
-    // }
-    function __(key, sharedData, replace = {}) {
-            let data = key.split('.');
-            // console.log(sharedData, 'esaaa');
-            let translation = sharedData[data[1]] || key;
-            Object.keys(replace).forEach(function (key) {
-                translation = translation.replace(':' + key, replace[key])
-            });
-            //console.log(translation);
-            return translation;
-        }
-
-
+        return translation;
+    }
 </script>
-
-
-
 @inertia
 </body>
 

@@ -22,7 +22,10 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ContactController;
 use App\Http\Controllers\Client\AboutUsController;
 use App\Http\Controllers\Client\ServiceController;
+use App\Http\Controllers\Google2FAController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::post('ckeditor/image_upload', [CKEditorController::class, 'upload'])->name('upload');
 
@@ -50,12 +53,6 @@ Route::prefix('{locale?}')
                 Route::resource('language', LanguageController::class);
                 Route::get('language/{language}/destroy', [LanguageController::class, 'destroy'])->name('language.destroy');
 
-
-                Route::get('setting/active', [SettingController::class, 'setActive'])->name('setting.active');
-                //settings
-                Route::resource('setting', \App\Http\Controllers\Admin\SettingController::class);
-                Route::get('setting/{setting}/destroy', [\App\Http\Controllers\Admin\SettingController::class, 'destroy'])->name('setting.destroy');
-
                 // Translation
                 Route::resource('translation', TranslationController::class);
 
@@ -74,6 +71,7 @@ Route::prefix('{locale?}')
                 // Blog
                 Route::resource('user', \App\Http\Controllers\Admin\UserController::class);
                 Route::get('user/{user}/destroy', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('user.destroy');
+                Route::get('user/{user}/desible', [\App\Http\Controllers\Admin\UserController::class, 'tfi'])->name('user.tfi');
 
                 Route::resource('moderator', \App\Http\Controllers\Admin\ModeratorController::class);
                 Route::get('moderator/{moderator}/destroy', [\App\Http\Controllers\Admin\ModeratorController::class, 'destroy'])->name('moderator.destroy');
@@ -106,6 +104,9 @@ Route::prefix('{locale?}')
                 Route::resource('currency', \App\Http\Controllers\Admin\CurrencyController::class);
                 Route::get('currency/{currency}/destroy', [\App\Http\Controllers\Admin\CurrencyController::class, 'destroy'])->name('currency.destroy');
 
+                Route::resource('withdraw', \App\Http\Controllers\Admin\WithdrawController::class);
+                Route::get('withdraw/{withdraw}/destroy', [\App\Http\Controllers\Admin\WithdrawController::class, 'destroy'])->name('withdraw.destroy');
+
                 Route::get('mailer', [\App\Http\Controllers\Admin\MailerController::class, 'index'])->name('mailer.index');
                 Route::put('mailer/{mailer}', [\App\Http\Controllers\Admin\MailerController::class, 'update'])->name('mailer.update');
             });
@@ -132,13 +133,14 @@ Route::prefix('{locale?}')
             Route::post('/contact-us', [ContactController::class, 'mail'])->name('contact.mail');
 
 
+            Route::get('scams', [\App\Http\Controllers\Client\ScamsController::class, 'index'])->name('scam.index');
+
+
             // About Page
             Route::get('about', [AboutUsController::class, 'index'])->name('about.index');
-
             Route::get('scams', [\App\Http\Controllers\Client\ScamsController::class, 'index'])->name('scam.index');
 
             Route::get('scams/{scam}', [\App\Http\Controllers\Client\ScamsController::class, 'show'])->name('scam.show');
-
 
             // Service Page
             Route::get('/service', [ServiceController::class, "index"])->name('service.index');
@@ -172,23 +174,77 @@ Route::prefix('{locale?}')
             Route::get("/report-incident", function () {
                 return \Inertia\Inertia::render("ReportIncident/ReportIncident");
             })->name('incident.index');
+            Route::get("/sign-up", function () {
+                return \Inertia\Inertia::render("Login/SignUp");
+            })->name('signup.index');
 
+            Route::get('/service', [ServiceController::class, "index"])->name('service.index');
+            Route::get('/service/{service?}', [ServiceController::class, "show"])->name('service.show');
+            Route::prefix("fraud")->name('fraud.')->group(function () {
+                Route::get("/recovery", function () {
+                    return \Inertia\Inertia::render("FinanceFraud/Recovery");
+                })->name('recovery.index');
+                Route::get("/detection", function () {
+                    return \Inertia\Inertia::render("FinanceFraud/Detection");
+                })->name('detection.index');
+                Route::get("/expertise", function () {
+                    return \Inertia\Inertia::render("FinanceFraud/Expertise");
+                })->name('expertise.index');
+            });
+            Route::get("/blockchain", function () {
+                return \Inertia\Inertia::render("FinanceFraud/Blockchain");
+            })->name('blockchain.index');
+            Route::get("/regulating-entities", function () {
+                return \Inertia\Inertia::render("FinanceFraud/RegulatingEntities");
+            })->name('entities.index');
+            Route::get("/framework", function () {
+                return \Inertia\Inertia::render("FinanceFraud/Framework");
+            })->name('framework.index');
+            Route::get("/organization", function () {
+                return \Inertia\Inertia::render("Organization/Organization");
+            })->name('organization.index');
+            Route::get("/efforts", function () {
+                return \Inertia\Inertia::render("Organization/Efforts");
+            })->name('efforts.index');
+            Route::get("/report-incident", function () {
+                return \Inertia\Inertia::render("ReportIncident/ReportIncident");
+            })->name('incident.index');
             Route::middleware(['authFront'])->group(function () {
 
                 Route::get('/dashboard', [\App\Http\Controllers\Client\UserController::class, 'index'])->name('account.index');
                 Route::get('/settings', [\App\Http\Controllers\Client\UserController::class, 'settings'])->name('settings');
 
+                Route::get('/transactions', [\App\Http\Controllers\Client\UserController::class, 'transactions'])->name('transactions');
+
+                Route::get('/kyc', [\App\Http\Controllers\Client\UserController::class, 'kyc'])->name('kyc');
+                Route::get('/kyc-app', [\App\Http\Controllers\Client\UserController::class, 'kycApp'])->name('kyc-app');
+                Route::get('/kyc-appp', [\App\Http\Controllers\Client\UserController::class, 'kycAppp'])->name('kyc-appp');
+                Route::get('/account', [\App\Http\Controllers\Client\UserController::class, 'account'])->name('account');
+                Route::get('/security', [\App\Http\Controllers\Client\UserController::class, 'security'])->name('security');
+                Route::get('/activity', [\App\Http\Controllers\Client\UserController::class, 'activity'])->name('activity');
+                Route::get('/policy', [\App\Http\Controllers\Client\UserController::class, 'policy'])->name('policy');
+                Route::get('/faq', [\App\Http\Controllers\Client\UserController::class, 'faq'])->name('faq');
+
                 Route::post('/change-account', [\App\Http\Controllers\Client\UserController::class, 'saveAccount'])->name('changeAccount');
+
+                Route::post('/save-activity', [\App\Http\Controllers\Client\UserController::class, 'saveActivity'])->name('save-activity');
+
+                Route::get('/withdrawal', [\App\Http\Controllers\Client\WithdrawalController::class, 'index'])->name('withdrawal');
+
+                Route::post('/withdrawal', [\App\Http\Controllers\Client\WithdrawalController::class, 'withdrawalStore'])->name('withdrawal.store');
 
                 Route::get('/change-password', [\App\Http\Controllers\Client\UserController::class, 'changePasswordView'])->name('changePassword');
                 Route::post('change-password', [\App\Http\Controllers\Client\UserController::class, 'changePassword'])->name('changePassword');
                 //                Route::post('upload-document', [\App\Http\Controllers\Client\UserController::class, 'uploadUserDoc'])->name('uploadDocument');
-                Route::post('upload-document', [\App\Http\Controllers\Client\UserController::class, 'uploadDocuments'])->name('uploadDocument');
+                Route::post('upload-document1', [\App\Http\Controllers\Client\UserController::class, 'uploadDocuments'])->name('uploadDocument');
+                Route::post('upload-document', [\App\Http\Controllers\Client\UserController::class, 'uploadDocuments2'])->name('uploadDocument2');
                 Route::get('log-out', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
             });
             Route::get("/log-in", [\App\Http\Controllers\Auth\LoginController::class, 'loginView'])->name('login.index');
-            Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
-            Route::post('/register', [\App\Http\Controllers\Auth\LoginController::class, 'signup'])->name('register');
+            Route::get("/verifylogin", [\App\Http\Controllers\Auth\LoginController::class, 'verifylogin'])->name('verifylogin');
+            Route::post('/log-in', [\App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login');
+            Route::post('/sign-up', [\App\Http\Controllers\Auth\LoginController::class, 'signup'])->name('signup');
+
 
 
 
@@ -196,14 +252,27 @@ Route::prefix('{locale?}')
             //                return \Inertia\Inertia::render("Account/Account");
             //            })->name('account.index');
 
-            Route::get("/sign-up", function () {
-                return \Inertia\Inertia::render("auth/SignUp");
-            })->name('signup.index');
 
-            Route::post('sign-upp', [\App\Http\Controllers\Auth\LoginController::class, 'signup'])->name('signup');
         });
-
-        Route::get('/forgot-password', function () {
-            return \Inertia\Inertia::render("auth/ResetPassword");
-        })->middleware('guest')->name('password.request');
     });
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect('/');
+})->middleware(['authFront', 'signed'])->name('verification.verify');
+
+Route::get('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['authFront', 'throttle:6,1'])->name('verification.send');
+
+// 2fa routes
+
+Route::get('/2fa/enable', [Google2FAController::class, 'enableTwoFactor'])->name('enableTwoFactor');
+Route::get('/2fa/verify', [Google2FAController::class, 'verifyKey'])->name('verifytfa');
+Route::post('/2fa/verifyDisable', [Google2FAController::class, 'verifyDisable'])->name('verifyDisable');
+Route::get('/2fa/disable', [Google2FAController::class, 'disableTwoFactor'])->name('disableTwoFactor');
+Route::get('/2fa/validate', [Google2FAController::class, 'getValidateToken'])->name('getValidateToken');
+Route::post('/2fa/validatee', [Google2FAController::class, 'postValidateToken'])->name('postValidateToken');

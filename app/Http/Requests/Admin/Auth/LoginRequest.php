@@ -1,5 +1,4 @@
 <?php
-
 /**
  *  app/Http/Requests/Admin/Auth/LoginRequest.php
  *
@@ -7,7 +6,6 @@
  * Time: 15:27
  * @author suspended values
  */
-
 namespace App\Http\Requests\Admin\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;

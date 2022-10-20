@@ -112,15 +112,15 @@ img {
 }
 .main_button {
     color: #fff;
-    background-color: #d4612a;
+    background-color: #942fdb;
     padding: 11px 13px;
     min-width: 100%;
     transition: 0.3s;
 }
 .main_button.transparent {
     background-color: transparent;
-    border: 2px solid #d4612a;
-    color: #d4612a;
+    border: 2px solid #942fdb;
+    color: #942fdb;
     padding: 9px 13px;
 }
 .main_button:hover {
@@ -140,7 +140,6 @@ img {
 .bgd_text {
     background-color: #eff5ff;
     padding: 6px 15px;
-    width: -webkit-fit-content;
     width: -moz-fit-content;
     width: fit-content;
     border-radius: 7px;

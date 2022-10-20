@@ -31,7 +31,7 @@
         <div class="left-content">
             <span class="main-content-title mg-b-0 mg-b-lg-1">{{__('admin.mailer_text_settings')}}</span>
         </div>
-         
+
     </div>
     <!-- /breadcrumb -->
 
@@ -142,6 +142,30 @@
                         @enderror
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label">@lang('admin.mail_verified_subject')</label>
+                        <input class="form-control" type="text" name="mail_verified_subject" value="{{$mail->mail_verified_subject}}">
+                        @error('mail_verified_subject')
+                        <small class="text-danger">
+                            <div class="error">
+                                {{$message}}
+                            </div>
+                        </small>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">@lang('admin.mail_verified')</label>
+                        <textarea id="mail_verified" class="form-control" type="text" name="mail_verified">{{$mail->mail_verified}}</textarea>
+                        @error('mail_verified')
+                        <small class="text-danger">
+                            <div class="error">
+                                {{$message}}
+                            </div>
+                        </small>
+                        @enderror
+                    </div>
+
 
 
                 </div>
@@ -150,15 +174,11 @@
         <div class="col-lg-6 col-md-12">
             <div class="card">
                 <div class="card-body">
-
                     <div class="form-group mb-0 mt-3 justify-content-end">
                         <div>
                             {!! Form::submit(__('admin.update'),['class' => 'btn btn-primary']) !!}
                         </div>
                     </div>
-
-
-
                 </div>
             </div>
         </div>
@@ -245,6 +265,10 @@
     <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
     <script>
         CKEDITOR.replace('status_approve', {
+            filebrowserUploadUrl: "{{route('upload', ['_token' => csrf_token(),'type'=>'user'])}}",
+            filebrowserUploadMethod: 'form',
+        });
+        CKEDITOR.replace('mail_verified', {
             filebrowserUploadUrl: "{{route('upload', ['_token' => csrf_token(),'type'=>'user'])}}",
             filebrowserUploadMethod: 'form',
         });

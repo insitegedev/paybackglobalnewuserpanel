@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  app/Models/Language.php
  *
@@ -6,6 +7,7 @@
  * Time: 14:16
  * @author suspended values
  */
+
 namespace App\Models;
 
 use App\Traits\ScopeFilter;
@@ -30,7 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Language extends Model
 {
-    use HasFactory, softDeletes, ScopeFilter,FormAccessible;
+    use HasFactory, softDeletes, ScopeFilter, FormAccessible;
 
     /**
      * The table associated with the model.
@@ -84,5 +86,4 @@ class Language extends Model
     {
         return $this->morphOne(File::class, 'fileable');
     }
-
 }

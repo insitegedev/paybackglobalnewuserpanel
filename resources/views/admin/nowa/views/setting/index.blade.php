@@ -11,14 +11,12 @@
 
 
     <!-- breadcrumb -->
-    {{-- <div class="breadcrumb-header justify-content-between">
+    <div class="breadcrumb-header justify-content-between">
         <div class="left-content">
             <span class="main-content-title mg-b-0 mg-b-lg-1">@lang('admin.setting')</span>
         </div>
-        <div class="justify-content-center mt-2">
-            @include('admin.nowa.views.layouts.components.breadcrump')
-        </div>
-    </div> --}}
+         
+    </div>
     <!-- /breadcrumb -->
 
     <!-- row opened -->
@@ -68,12 +66,13 @@
                                                class="validate {{$errors->has('value') ? '' : 'valid'}}">
                                     </th>
                                 </tr>
+
                                 @if($settings)
                                     @foreach($settings as $setting)
                                         <tr>
                                             <td>{{$setting->id}}</td>
                                             <td>
-                                                @if($setting->key == 'instagram' || $setting->key == 'facebook')
+                                                @if($setting->key == 'instagram' || $setting->key == 'facebook' || $setting->key == 'youtube')
                                                 <div class="checkbox">
                                                     <div class="custom-checkbox custom-control">
                                                         <input type="checkbox" data-setting="{{$setting->id}}" name="status" class="custom-control-input" id="checkbox-{{$setting->id}}" {{$setting->active ? 'checked' : ''}}>
@@ -90,8 +89,7 @@
                                                             <!-- Tabs -->
                                                             <ul class="nav panel-tabs main-nav-line">
                                                                 @foreach(config('translatable.locales') as $locale)
-                                                                {{-- @dd($locale) --}}
-                                                                    <li><a href="#cat-{{$locale['locale']}}-{{$setting->id}}" class="nav-link {{$loop->first?"active":""}}" data-bs-toggle="tab">{{$locale['locale']}}</a></li>
+                                                                    <li><a href="#cat-{{$locale}}-{{$setting->id}}" class="nav-link {{$loop->first?"active":""}}" data-bs-toggle="tab">{{$locale}}</a></li>
                                                                 @endforeach
 
                                                             </ul>
@@ -101,8 +99,8 @@
                                                         <div class="tab-content">
 
                                                             @foreach(config('translatable.locales') as $locale)
-                                                                <div class="tab-pane {{$loop->first?"active":""}}" id="cat-{{$locale['locale']}}-{{$setting->id}}">
-                                                                    {{$setting->translate($locale['locale'])->value ?? ''}}
+                                                                <div class="tab-pane {{$loop->first?"active":""}}" id="cat-{{$locale}}-{{$setting->id}}">
+                                                                    {{$setting->translate($locale)->value ?? ''}}
                                                                 </div>
                                                             @endforeach
 
@@ -117,7 +115,7 @@
 
                                                 <a href="{{locale_route('setting.edit',$setting->id)}}"
                                                    class="pl-3">
-                                                    <i class="fa fa-edit">შეცვლა</i>
+                                                    <i class="fa fa-edit">Edit</i>
                                                 </a>
 
 

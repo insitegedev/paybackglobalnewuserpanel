@@ -1,4 +1,3 @@
-
 @extends('admin.nowa.views.layouts.app')
 
 @section('styles')
@@ -43,7 +42,6 @@
                     {{--<div class="form-group">
                         <label class="form-label">{{__('admin.unique_id')}}</label>
                         <input disabled readonly class="form-control" type="text" name="name" value="{{$user->unique_id}}">
-
                     </div>--}}
 
                         <div class="form-group">
@@ -118,25 +116,18 @@
                     {{--<div class="form-group">
                         <label class="form-label">{{__('admin.eth_balance')}}</label>
                         <input class="form-control" type="text" name="eth" value="{{isset($customer->balance['eth']) ? $customer->balance['eth'] : null}}">
-
                     </div>
-
                     <div class="form-group">
                         <label class="form-label">{{__('admin.dac_balance')}}</label>
                         <input class="form-control" type="text" name="dac" value="{{isset($customer->balance['dac']) ? $customer->balance['dac'] : null}}">
-
                     </div>
-
                     <div class="form-group">
                         <label class="form-label">{{__('admin.btc_balance')}}</label>
                         <input class="form-control" type="text" name="btc" value="{{isset($customer->balance['btc']) ? $customer->balance['btc'] : null}}">
-
                     </div>
-
                     <div class="form-group">
                         <label class="form-label">{{__('admin.usd_balance')}}</label>
                         <input class="form-control" type="text" name="usd" value="{{isset($customer->balance['usd']) ? $customer->balance['usd'] : null}}">
-
                     </div>
 --}}
 
@@ -197,7 +188,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label class="form-label">{{__('admin.verified')}}</label>
                         <select name="verified" class="form-control">
                             <option
@@ -215,6 +206,50 @@
                             </div>
                         </small>
                         @enderror
+                    </div> --}}
+                    @php
+                        $mytime = Carbon\Carbon::now();
+                    @endphp
+
+                    <div class="form-group">
+                        <label class="form-label">{{__('admin.mail.verified')}}</label>
+                        <select name="email_verified_at" class="form-control">
+                            <option
+                                {{$user->email_verified_at?"selected":""}}
+                                 {{-- value={{Carbon\Carbon::createFromTimestamp($timestamp)->toDateTimeString()}} --}}
+                                 value={{date("Y-m-d h:i:sa")}}
+                                 >@lang('client.verified')</option>
+                            <option
+                                {{!$user->email_verified_at?"selected":""}} value=null>@lang('client.not_verified')</option>
+                        </select>
+
+
+
+                        @error('email_verified_at')
+                        <small class="errorTxt4">
+                            <div class="error">
+                                {{$message}}
+                            </div>
+                        </small>
+                        @enderror
+                    </div>
+
+                    <?php
+                    $statuses = [
+                        'pending' => __('admin.pending'),
+                        'reject' => __('admin.rejected'),
+                        'miss' => __('admin.missing'),
+                        'verified' => __('admin.verified'),
+                    ]
+                    ?>
+                    <div class="form-group">
+                        <label class="form-label">@lang('admin.verification_status')</label>
+                        <select name="verification_status" class="form-control">
+
+                            @foreach($statuses as $key => $status)
+                                <option value="{{$key}}" {{$user->verification_status == $key ? 'selected':''}}>{{$status}}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -229,11 +264,30 @@
                         @enderror
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label">{{__('admin.requirements')}}</label>
+                        <input class="form-control" type="text" name="requirements" value="{{$user->requirements}}">
+                        @error('requirements')
+                        <small class="text-danger">
+                            <div class="error">
+                                {{$message}}
+                            </div>
+                        </small>
+                        @enderror
+                    </div>
+
 
 
                     <div class="form-group">
 
                             <label class="ckbox"><input type="checkbox" name="is_send_email" value="true" {{$user->is_send_email ? 'checked' : ''}}><span>{{__('admin.send_email')}}</span></label>
+
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="ckbox"><input type="checkbox" name="can_withdraw" value="true" {{$user->can_withdraw ? 'checked' : ''}}><span>{{__('admin.can_withdraw')}}</span></label>
 
 
                     </div>
@@ -269,7 +323,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <input name="value[]" class="form-control" placeholder="value" type="number" value="{{$balance->value}}"><button type="button" class="btn del_cur">delete</button>
+                                <input name="value[]" class="form-control" placeholder="value" type="text" value="{{$balance->value}}"><button type="button" class="btn del_cur">delete</button>
                             </div>
                         @endforeach
                     </div>
@@ -353,7 +407,6 @@
                                     $header = __('admin.driver_license_file');
                                     break;
                             }
-
                             ?>
                             <div class="col col-sm-3">
                                 <h6>{{$header}}</h6>
@@ -443,7 +496,6 @@
 
     <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
     <script>
-
         @foreach(config('translatable.locales') as $locale)
         CKEDITOR.replace('description-{{$locale['locale']}}', {
             filebrowserUploadUrl: "{{route('upload', ['_token' => csrf_token() ])}}",
@@ -456,41 +508,29 @@
         $('#add_balance').click(function (e){
             let options = '';
             let cur = @json($currencies);
-
-
             cur.forEach(function (el,i){
                 options += '<option value="' + el.id + '">' + el.code + '</option>';
             });
-
             console.log(options);
-            let row = $('<div class="input-group"> <div class="input-group-text"> <select name="currency_id[]">' + options + '</select></div> <input name="value[]" class="form-control" id="dateMask" placeholder="value" type="number"><button type="button" class="btn del_cur">delete</button> </div>');
+            let row = $('<div class="input-group"> <div class="input-group-text"> <select name="currency_id[]">' + options + '</select></div> <input name="value[]" class="form-control" id="dateMask" placeholder="value" type="text"><button type="button" class="btn del_cur">delete</button> </div>');
             $('#balance').append(row);
         });
-
         $(document).on('click','.del_cur',function (e){
-
             $(this).parent('.input-group').remove()
         });
-
-
         $('#add_wallet').click(function (e){
             let options = '';
             let cur = @json($currencies);
-
             cur.forEach(function (el,i){
                 options += '<option value="' + el.id + '">' + el.code + '</option>';
             });
-
             console.log(options);
             let row = $('<div class="input-group"> <div class="input-group-text"> <select name="wall_currency_id[]">' + options + '</select></div> <input name="address[]" class="form-control" id="dateMask" placeholder="address" type="text"><button type="button" class="btn del_wall">delete</button> </div>');
             $('#wallet').append(row);
         });
-
         $(document).on('click','.del_wall',function (e){
-
             $(this).parent('.input-group').remove()
         });
-
         $('[name="currency_id[]"]').change(function (e){
             /*let id = $(this).val();
             $('#balance').find('[name="currency_id[]"]').each(function (el,i){

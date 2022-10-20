@@ -6,6 +6,9 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Middleware;
+use App\Models\User;
+use App\Models\Language;
+use Illuminate\Support\Facades\Auth;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -40,7 +43,8 @@ class HandleInertiaRequests extends Middleware
     {
         $user = auth()->user();
         $this->settings();
-        $locales = config("translatable.locales");
+        // $locales = config("translatable.locales");
+        $locales = Language::all();
         $currentRoute = url()->current();
         //        dd($user->only(['email']));
 
@@ -50,6 +54,7 @@ class HandleInertiaRequests extends Middleware
         $urlPrev = $this->urlPrev();
         return array_merge(parent::share($request), [
             "locales" => $locales,
+            "acc" => Auth::user(),
             "pathname" => $currentRoute,
             "locale_urls" => $locale_urls,
             'urlPrev' => $urlPrev,
@@ -60,9 +65,20 @@ class HandleInertiaRequests extends Middleware
                 },
                 'fail' => function () use ($request) {
                     return $request->session()->get('fail', null);
-                }
+                },
             ],
-            '_account' => auth()->user()
+            'account' => User::where("id", auth()->id())->with([
+                "files",
+                "profile",
+                "activity",
+                'balances',
+                'balances.currency',
+                'balances.currency.file',
+                'wallets',
+                'wallets.currency',
+            ])->first(),
+            '_account' => auth()->user(),
+
         ]);
     }
 

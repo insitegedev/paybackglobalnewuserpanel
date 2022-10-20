@@ -6,25 +6,22 @@
     array (
       'id' => 1,
       'locale' => 'en',
-      'title' => 'EN',
-      'file' => 
-      array (
-        'fileable_id' => 1,
-        'title' => '2022070656united-kingdom(1).png',
-        'path' => 'storage/Language/1',
-      ),
+      'title' => 'English',
+      'file' => NULL,
     ),
     1 => 
     array (
       'id' => 3,
-      'locale' => 'de',
-      'title' => 'DE',
-      'file' => 
-      array (
-        'fileable_id' => 3,
-        'title' => '2022071023german(1).png',
-        'path' => 'storage/Language/3',
-      ),
+      'locale' => 'ge',
+      'title' => 'georgian',
+      'file' => NULL,
+    ),
+    2 => 
+    array (
+      'id' => 4,
+      'locale' => 'ru',
+      'title' => 'russian',
+      'file' => NULL,
     ),
   ),
   'locale_separator' => '-',

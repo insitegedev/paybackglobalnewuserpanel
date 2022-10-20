@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Auth\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Mail\ContactEmail;
+use App\Models\Activity;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Notifications\Registered;
@@ -22,6 +23,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Browser;
+
+
+use Cache;
+use Illuminate\Contracts\Auth\Authenticatable;
+use App\Http\Requests\ValidateSecretRequest;
 
 /**
  * Class AuthController
@@ -48,11 +55,19 @@ class LoginController extends Controller
      */
     public function loginView($locale, Request $request)
     {
-        // return 'asdsad';
         $danger = $request->session()->get('danger', null);
 
-        return \Inertia\Inertia::render("auth/SignIn", ["danger" => $danger]);
+        return \Inertia\Inertia::render("Login/SignIn", ["danger" => $danger]);
     }
+
+    public function verifylogin($locale, Request $request)
+    {
+        $danger = $request->session()->get('danger', null);
+
+        return \Inertia\Inertia::render("Verify/Verify", ["danger" => $danger]);
+    }
+
+
 
     /**
      * Authenticate login user.
@@ -62,9 +77,44 @@ class LoginController extends Controller
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
-    public function login(LoginRequest $request)
+
+    public function getValidateToken()
     {
-        // dd($request->post());
+        if (session('2fa:user:id')) {
+            return view('2fa/validate');
+        }
+
+        return redirect('login');
+    }
+
+
+    public function postValidateToken(ValidateSecretRequest $request)
+    {
+        //get user id and create cache key
+        $userId = $request->session()->pull('2fa:user:id');
+        $key    = $userId . ':' . $request->totp;
+
+        //use cache to store token to blacklist
+        Cache::add($key, true, 4);
+
+        //login and redirect user
+        Auth::loginUsingId($userId);
+
+        return redirect()->intended($this->redirectTo);
+    }
+
+
+    public function login(LoginRequest $request, User $user)
+    {
+
+        // if ($user->google2fa_secret) {
+        //     Auth::logout();
+
+        //     $request->session()->put('2fa:user:id', $user->id);
+
+        //     return redirect('2fa/validate');
+        // }
+
         if (!\Auth::attempt([
             'email' => $request->email,
             'password' => $request->password,
@@ -81,7 +131,22 @@ class LoginController extends Controller
                 return redirect(locale_route("client.login.index"));
             } else {
 
-                return redirect(locale_route("client.home.index"))->with('success', __('client.success_login'));;
+                //dd(Browser::deviceType(),$request->ip());
+                if (Auth()->user()->google2fa_secret) {
+                    $request->session()->put('2fa:user:id', Auth()->user()->id);
+                    Auth::logout();
+                    return redirect(route("getValidateToken"));
+                };
+                if (\auth()->user()->save_activity) {
+                    Activity::query()->create([
+                        'ip_address' => $request->ip(),
+                        'user_id' => \auth()->id(),
+                        'device' => Browser::deviceType() . ' - ' . Browser::platformName(),
+                        'browser' => Browser::browserName()
+                    ]);
+                }
+
+                return redirect(locale_route("client.home.index"))->with('success', __('client.success_login'));
             }
         } else {
             \Auth::logout();
@@ -99,13 +164,24 @@ class LoginController extends Controller
         }
     }
 
+    public function generateUniqueCode(): int
+    {
+        do {
+            $code = random_int(100, 999);
+        } while (User::where("unique_id", "=", $code)->first());
+
+        return $code;
+    }
+
+
     public function signup($locale, RegisterRequest $request)
     {
         $user = User::create([
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
             'is_admin' => 0,
-            'balance' => "0"
+            'balance' => "0",
+            'unique_id' => $this->generateUniqueCode(),
         ]);
 
         if ($user) {

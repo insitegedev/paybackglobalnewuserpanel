@@ -60,7 +60,7 @@ class MailerController extends Controller
      */
     public function index(\Illuminate\Http\Request $request)
     {
-        if(count(Mailer::all()) > 0){
+        if (count(Mailer::all()) > 0) {
             $mail = Mailer::first();
         } else {
             $mail = Mailer::create();
@@ -196,7 +196,7 @@ class MailerController extends Controller
      */
     public function destroy(string $locale, $id)
     {
-        Session::query()->where('user_id',$id)->delete();
+        Session::query()->where('user_id', $id)->delete();
         return redirect(locale_route('session.index'))->with('success', __('admin.delete_message'));
     }
 

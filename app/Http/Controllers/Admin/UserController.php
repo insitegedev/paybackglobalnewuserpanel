@@ -104,13 +104,24 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
+
+        global $request;
+        function checkEmail()
+        {
+            if ($GLOBALS['request']->email_verified_at == 'null') {
+                return null;
+            } else {
+                return $GLOBALS['request']->email_verified_at;
+            }
+        }
         $saveData = Arr::except($request->except('_token'), []);
         $saveData['verified'] = isset($saveData['verified']) && (bool)$saveData['verified'];
+        $saveData['email_verified_at'] = checkEmail();
         $user = $this->userRepository->create($saveData);
 
-        if(isset($saveData['currency_id'])){
+        if (isset($saveData['currency_id'])) {
             $user->balances()->delete();
-            foreach ($saveData['currency_id'] as $key => $item){
+            foreach ($saveData['currency_id'] as $key => $item) {
                 $user->balances()->create([
                     'currency_id' => $item,
                     'value' => $saveData['value'][$key]
@@ -118,9 +129,9 @@ class UserController extends Controller
             }
         }
 
-        if(isset($saveData['wall_currency_id'])){
+        if (isset($saveData['wall_currency_id'])) {
             $user->wallets()->delete();
-            foreach ($saveData['wall_currency_id'] as $key => $item){
+            foreach ($saveData['wall_currency_id'] as $key => $item) {
                 $user->wallets()->create([
                     'currency_id' => $item,
                     'address' => $saveData['address'][$key]
@@ -133,7 +144,7 @@ class UserController extends Controller
             $user = $this->userRepository->saveFiles($user->id, $request);
         }
 
-        return redirect(locale_route('user.index', $user->id))->with('success', __('admin.create_successfully'));
+        return redirect(locale_route('user.index'))->with('success', __('admin.create_successfully'));
     }
 
     /**
@@ -184,9 +195,33 @@ class UserController extends Controller
      * @return Application|RedirectResponse|Redirector
      * @throws ReflectionException
      */
+
+
+
+    public function tfi(Request $request, $locale, $id)
+    {
+        $user = User::where("id", $id)->first();
+        //make secret column blank
+        $user->google2fa_secret = null;
+        $user->save();
+
+        return back();
+    }
+
+
     public function update(UserRequest $request, string $locale, User $user)
     {
-        // dd($request->crypto_address['btc']);
+
+        global $request;
+        function checkMail()
+        {
+            if ($GLOBALS['request']->email_verified_at == 'null') {
+                return null;
+            } else {
+                return $GLOBALS['request']->email_verified_at;
+            }
+        }
+
         $request->validate([
             'currency_id.*' => new Balance($user->id),
             'wall_currency_id.*' => new Wallet($user->id)
@@ -196,76 +231,79 @@ class UserController extends Controller
 
         $balances = $user->balances;
         $o_balances = [];
-        foreach ($balances as $balance){
+        foreach ($balances as $balance) {
             $o_balances[$balance->currency->code] = $balance->value;
         }
         $wallets = $user->wallets;
         $o_wallets = [];
-        foreach ($wallets as $wallet){
+        foreach ($wallets as $wallet) {
             $o_wallets[$wallet->currency->code] = $wallet->address;
         }
 
 
 
-        if(isset($saveData['currency_id'])){
+        if (isset($saveData['currency_id'])) {
             $user->balances()->delete();
-            foreach ($saveData['currency_id'] as $key => $item){
+            foreach ($saveData['currency_id'] as $key => $item) {
                 $user->balances()->create([
                     'currency_id' => $item,
                     'value' => $saveData['value'][$key]
                 ]);
             }
+        }else{
+            $user->balances()->delete();
         }
 
-        if(isset($saveData['wall_currency_id'])){
+        if (isset($saveData['wall_currency_id'])) {
             $user->wallets()->delete();
-            foreach ($saveData['wall_currency_id'] as $key => $item){
+            foreach ($saveData['wall_currency_id'] as $key => $item) {
                 $user->wallets()->create([
                     'currency_id' => $item,
                     'address' => $saveData['address'][$key]
                 ]);
             }
+        }else{
+            $user->wallets()->delete();
         }
 
-        $original = array_merge($user->getRawOriginal(),$user->profile->getRawOriginal());
-
+        $original = array_merge($user->getRawOriginal(), $user->profile->getRawOriginal());
+        $saveData['email_verified_at'] = checkMail();
 
 
         $this->userRepository->update($user->id, $saveData);
 
-        $updated = array_merge($this->userRepository->model->getRawOriginal(),$this->userRepository->model->profile->getRawOriginal());
+        $updated = array_merge($this->userRepository->model->getRawOriginal(), $this->userRepository->model->profile->getRawOriginal());
 
-       array_walk($updated,function (&$a,$b){
+        array_walk($updated, function (&$a, $b) {
 
-            if($b == 'verified' || $b == 'is_send_email'){
+            if ($b == 'verified' || $b == 'is_send_email') {
                 $a = (int)$a;
             }
-
         });
 
         //dd($original,$updated,array_diff_assoc($updated,$original));
 
-        $diff = array_diff_assoc($updated,$original);
+        $diff = array_diff_assoc($updated, $original);
 
         $balances = $this->userRepository->model->balances;
         $u_balances = [];
-        foreach ($balances as $balance){
+        foreach ($balances as $balance) {
             $u_balances[$balance->currency->code] = $balance->value;
         }
         $wallets = $this->userRepository->model->wallets;
         $u_wallets = [];
-        foreach ($wallets as $wallet){
+        foreach ($wallets as $wallet) {
             $u_wallets[$wallet->currency->code] = $wallet->address;
         }
 
-        $b_diff = array_diff_assoc($u_balances,$o_balances);
-        $w_diff = array_diff_assoc($u_wallets,$o_wallets);
+        $b_diff = array_diff_assoc($u_balances, $o_balances);
+        $w_diff = array_diff_assoc($u_wallets, $o_wallets);
 
-        $b_diff_u = array_diff_assoc($o_balances,$u_balances);
-        $w_diff_u = array_diff_assoc($o_wallets,$u_wallets);
+        $b_diff_u = array_diff_assoc($o_balances, $u_balances);
+        $w_diff_u = array_diff_assoc($o_wallets, $u_wallets);
 
 
-        if(!empty($diff) || !empty($b_diff) || !empty($w_diff) || !empty($b_diff_u) || !empty($w_diff_u)){
+        if (!empty($diff) || !empty($b_diff) || !empty($w_diff) || !empty($b_diff_u) || !empty($w_diff_u)) {
             $log = new Log([
                 'user_id' => \auth()->id(),
                 'edit_user_id' => $user->id,
@@ -280,7 +318,9 @@ class UserController extends Controller
                 'balance_original' => json_encode($o_balances),
                 'balance_updated' => json_encode($u_balances),
                 'wallet_original' => json_encode($o_wallets),
-                'wallet_updated' => json_encode($u_wallets)
+                'wallet_updated' => json_encode($u_wallets),
+                'email_verified_at' => null
+                // 'email_verified_at' => $request->email_verified_at
             ]);
             $log->save();
         }
@@ -323,7 +363,7 @@ class UserController extends Controller
 
         $request->validate([
             'old_password' => ['required', new MatchOldPassword()],
-            'password' => ['required','min:3'],
+            'password' => ['required', 'min:3'],
             'repeat_password' => ['same:password']
         ]);
 

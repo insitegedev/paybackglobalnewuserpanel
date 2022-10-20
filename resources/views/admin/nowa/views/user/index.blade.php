@@ -35,12 +35,14 @@
                             <table class="table mg-b-0 text-md-nowrap">
                                 <thead>
                                 <tr>
-                                    <th>@lang('admin.id')</th>
+                                    <th>@lang('admin.unicid')</th>
                                     <th>@lang('admin.name')</th>
                                     <th>@lang('admin.email')</th>
                                     <th>@lang('admin.phone')</th>
+                                    <th>@lang('admin.email_verified')</th>
                                     <th>@lang('admin.status')</th>
                                     <th>@lang('admin.date')</th>
+                                    <th>@lang('admin.tfi')</th>
 
                                 </tr>
                                 </thead>
@@ -48,25 +50,47 @@
 
                                 <tr>
                                     <th>
-                                        <input class="form-control" type="number" name="id" onchange="this.form.submit()"
-                                               value="{{Request::get('id')}}"
-                                               class="validate {{$errors->has('id') ? '' : 'valid'}}">
+                                        <input class="form-control" type="text" name="unique_id" onchange="this.form.submit()"
+                                               value="{{Request::get('unique_id')}}"
+                                               class="validate {{$errors->has('unique_id') ? '' : 'valid'}}">
+                                    </th>
+                                    <th>
+                                        <input class="form-control" type="text" name="name" onchange="this.form.submit()"
+                                               value="{{Request::get('name')}}"
+                                               class="validate {{$errors->has('name') ? '' : 'valid'}}">
                                     </th>
                                     <th>
                                         <input class="form-control" type="text" name="email" onchange="this.form.submit()"
                                                value="{{Request::get('email')}}"
                                                class="validate {{$errors->has('email') ? '' : 'valid'}}">
                                     </th>
-                                    <th></th>
+                                    <th>
+                                        <input class="form-control" type="number" name="phone" onchange="this.form.submit()"
+                                               value="{{Request::get('phone')}}"
+                                               class="validate {{$errors->has('phone') ? '' : 'valid'}}">
+                                    </th>
 
 
                                 @if($data)
                                     @foreach($data as $user)
                                         <tr>
-                                            <td>{{$user->id}}</td>
+                                            <td>IXIA1A{{{$user->unique_id}}}</td>
                                             <td>{{$user->profile?$user->profile->name:""}} {{$user->profile?$user->profile->surname:""}}</td>
                                             <td>{{$user->email}}</td>
                                             <td>{{$user->profile?$user->profile->phone:''}}</td>
+                                            <td>
+                                                @if($user->email_verified_at)
+                                                    <div class="alert alert-success" role="alert">
+                                                        <span class="alert-inner--icon"><i class="fe fe-thumbs-up"></i></span>
+                                                        <span class="alert-inner--text"><strong>Verified!</strong> {{$user->email_verified_at}}</span>
+                                                    </div>
+                                                @else
+                                                    <div class="alert alert-warning" role="alert">
+                                                        <span class="alert-inner--icon"><i class="fe fe-info"></i></span>
+                                                        <span class="alert-inner--text"><strong>Warning!</strong> email not verified!</span>
+                                                    </div>
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if($user->status == 'approved')
                                                 <div class="alert alert-success" role="alert">
@@ -88,6 +112,19 @@
                                             <td>{{$user->created_at}}
                                             </td>
 
+                                            @if ($user->google2fa_secret)
+                                            <td>
+                                                <a class="btn btn-danger" href={{route("user.tfi",$user->id) }}>disable</a>
+                                            </td>
+                                            @else
+                                            <td>
+                                                <a class="btn btn-danger disabled" href={{route("user.tfi",$user->id) }}>disabled</a>
+                                            </td>
+                                            @endif
+
+
+
+
                                             <td>
 
                                                 <a href="{{locale_route('user.edit',$user->id)}}"
@@ -99,7 +136,6 @@
                                                     <i class="fa fa-edit">Delete</i>
                                                 </a>
                                             </td>
-
                                         </tr>
                                     @endforeach
                                 @endif

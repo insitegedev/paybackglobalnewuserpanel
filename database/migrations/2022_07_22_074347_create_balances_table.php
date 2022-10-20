@@ -19,7 +19,7 @@ class CreateBalancesTable extends Migration
             $table->bigInteger('currency_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('currency_id')->references('id')->on('currencies')->onDelete('cascade');
-            $table->integer('value')->nullable();
+            $table->text('value')->nullable();
             $table->timestamps();
         });
     }

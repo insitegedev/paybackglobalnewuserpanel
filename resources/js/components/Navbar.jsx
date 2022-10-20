@@ -141,34 +141,6 @@ const Navbar = () => {
                             {__("client.account", sharedData)}
                         </Link> : null}
 
-                        {/* if logged in 👇 */}
-
-                        {/* <div className="group relative mr-4 py-5">
-              <div className="w-6 h-6 rounded-full overflow-hidden">
-                <img src={user} alt="" />
-              </div>
-              <div className="navDropdown absolute lg:left-5 left-1/2 -translate-x-1/2 top-12 text-sm whitespace-nowrap bg-white rounded py-2 shadow-lg translate-y-4 invisible opacity-0 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0  transition z-50">
-                <Link
-                  to="/account"
-                  className="w-full px-5 py-2 hover:bg-gray block"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/account"
-                  className="w-full px-5 py-2 hover:bg-gray block"
-                >
-                  Account settings
-                </Link>
-                <Link
-                  to="/account"
-                  className="w-full px-5 py-2 hover:bg-gray block"
-                >
-                  Change password
-                </Link>
-              </div>
-            </div>
-            <button>Log out</button> */}
                     </div>
                 </div>
                 <div

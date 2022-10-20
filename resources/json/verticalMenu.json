@@ -27,15 +27,15 @@
                     "i18n": "change_password",
                     "icon": "brightness_low",
                     "slug": "session"
+                },
+                {
+                    "url": "withdraw.index",
+                    "name": "Withdrawals",
+                    "i18n": "withdraw",
+                    "icon": "withdraw",
+                    "slug": "withdraw"
                 }
             ]
-        },
-        {
-            "url": "setting.index",
-            "name": "Settings",
-            "i18n": "setting",
-            "icon": "language",
-            "slug": "setting"
         },
         {
             "url": "javascript:void(0)",

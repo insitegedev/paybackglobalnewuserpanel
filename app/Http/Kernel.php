@@ -68,7 +68,8 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'setlocale' => \App\Http\Middleware\SetLocale::class,
         'active' => \App\Http\Middleware\EnableGlobalScopeMiddleware::class,
-        'isAdmin'=>IsAdmin::class
+        'isAdmin' => IsAdmin::class,
+        '2fa' => \PragmaRX\Google2FALaravel\Middleware::class,
 
     ];
 }

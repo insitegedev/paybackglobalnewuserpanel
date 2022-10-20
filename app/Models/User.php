@@ -13,11 +13,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Searchable\SearchResult;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Notifications\VerifyEmail;
 
-
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, ScopeFilter, Notifiable, SoftDeletes;
+    use HasFactory, ScopeFilter, Notifiable, SoftDeletes, HasApiTokens;
+
+    // public $timestamps = true;
 
     /**
      * The attributes that are mass assignable.
@@ -28,18 +32,26 @@ class User extends Authenticatable
         'email',
         'password',
         'verified',
+        'google2fa_secret',
         'verification_proggress',
         'status',
         'balance',
         'crypto_address',
         'is_admin',
+        'email_verified_at',
         'is_moderator',
         'is_send_email',
         'manager_name',
         'manager_email',
         'manager_phone',
         'link',
-        'deleted_by'
+        'deleted_by',
+        'can_withdraw',
+        'save_activity',
+        'verification_status',
+        'unique_id',
+        'requirements',
+        'mail_verified'
     ];
 
     /**
@@ -50,8 +62,17 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        // 'google2fa_secret'
     ];
 
+
+    // protected function google2faSecret()
+    // {
+    //     return new Attribute(
+    //         get: fn ($value) =>  decrypt($value),
+    //         set: fn ($value) =>  encrypt($value),
+    //     );
+    // }
     /**
      * The attributes that should be cast to native types.
      *
@@ -67,6 +88,10 @@ class User extends Authenticatable
             'id' => [
                 'hasParam' => true,
                 'scopeMethod' => 'id'
+            ],
+            'unique_id' => [
+                'hasParam' => true,
+                'scopeMethod' => 'unique_id'
             ],
             'status' => [
                 'hasParam' => true,
@@ -87,6 +112,10 @@ class User extends Authenticatable
             'moderator' => [
                 'hasParam' => true,
                 'scopeMethod' => 'moderator'
+            ],
+            'phone' => [
+                'hasParam' => true,
+                'scopeMethod' => 'phone'
             ],
             'admin' => [
                 'hasParam' => true,
@@ -219,5 +248,20 @@ class User extends Authenticatable
     public function deletedBy()
     {
         return $this->hasOne(User::class, 'id', 'deleted_by');
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmail); // my notification
+    }
+
+    public function activity(): HasMany
+    {
+        return $this->hasMany(Activity::class)->orderBy('created_at', 'desc');
+    }
+
+    public function withdrawals(): HasMany
+    {
+        return $this->hasMany(Withdrawal::class);
     }
 }

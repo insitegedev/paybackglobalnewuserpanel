@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  app/Http/Requests/Admin/ProjectRequest.php
  *
@@ -36,7 +37,7 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-//        // Check if method is get,fields are nullable.
+        //        // Check if method is get,fields are nullable.
         if ($this->method() === 'POST') {
             return [
                 'email' => 'required|max:255|unique:users|email',
@@ -45,7 +46,7 @@ class UserRequest extends FormRequest
                 'surname' => 'nullable|string|max:255',
                 'phone' => 'nullable|string|max:255',
                 'status' => 'nullable|string',
-                'verified' => 'nullable',
+                // 'verified' => 'nullable',
                 'usd' => 'nullable|numeric',
                 'eur' => 'nullable|numeric',
                 'gbp' => 'nullable|numeric',
@@ -65,7 +66,7 @@ class UserRequest extends FormRequest
             'surname' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:255',
             'status' => 'required|string',
-            'verified' => 'required',
+            // 'verified' => 'required',
             'usd' => 'nullable|numeric',
             'eur' => 'nullable|numeric',
             'gbp' => 'nullable|numeric',
@@ -78,6 +79,7 @@ class UserRequest extends FormRequest
             'dog' => 'nullable|numeric',
             'password' => 'nullable|string|max:100|min:6',
             'link' => 'nullable|string|max:255',
+            // 'balance' => 'nullable|string|max:255'
 
         ];
     }

@@ -1,5 +1,21 @@
 <?php
 
+$conn = new mysqli(env('DB_HOST'), env('DB_USERNAME'), env('DB_PASSWORD'), env('DB_DATABASE'));
+
+$sql = "SELECT * FROM mailer";
+$result = $conn->query($sql);
+
+
+$data = null;
+if ($result->num_rows > 0) {
+    $_row = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $_row[] = $row;
+    }
+    $data = $_row[0];
+}
+
 return [
 
     /*
@@ -36,11 +52,11 @@ return [
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
-            'port' => env('MAIL_PORT', 587),
-            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
+            'host' => $data ? $data['host'] : env('MAIL_HOST', 'smtp.mailgun.org'),
+            'port' => $data ? $data['port'] : env('MAIL_PORT', 587),
+            'encryption' => $data ? $data['encryption'] : env('MAIL_ENCRYPTION', 'tls'),
+            'username' => $data ? $data['username'] : env('MAIL_USERNAME'),
+            'password' => $data ? $data['password'] : env('MAIL_PASSWORD'),
             'timeout' => null,
             'auth_mode' => null,
         ],
@@ -84,8 +100,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => $data ? $data['from_address'] : env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => $data ? $data['from_name'] : env('MAIL_FROM_NAME', 'Example'),
     ],
 
     /*

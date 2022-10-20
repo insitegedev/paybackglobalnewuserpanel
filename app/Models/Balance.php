@@ -102,12 +102,13 @@ class Balance extends Model
         return $this->morphOne(File::class, 'fileable')->latestOfMany();
     }
 
-    public function customer():BelongsTo{
+    public function customer(): BelongsTo
+    {
         return $this->belongsTo(Customer::class);
     }
 
-    public function currency():BelongsTo{
+    public function currency(): BelongsTo
+    {
         return $this->belongsTo(Currency::class);
     }
-
 }

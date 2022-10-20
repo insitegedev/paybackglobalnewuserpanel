@@ -30,7 +30,7 @@ class RegisterRequest extends FormRequest
             'password' => 'required|string|max:255',
             'password_repeat' => 'required|string|max:255|same:password',
             'phone' => 'required|string|max:255',
-            // 'agree'=>'required'
+            'agree'=>'required'
         ];
     }
 }

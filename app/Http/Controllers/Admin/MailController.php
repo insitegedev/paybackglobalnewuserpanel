@@ -59,7 +59,7 @@ class MailController extends Controller
      */
     public function index(\Illuminate\Http\Request $request)
     {
-        if(count(Mail::all()) > 0){
+        if (count(Mail::all()) > 0) {
             $mail = Mail::first();
         } else {
             $mail = Mail::create([
@@ -182,6 +182,8 @@ class MailController extends Controller
             'status_reject_subject' => $request->post('status_reject_subject'),
             'verified_subject' => $request->post('verified_subject'),
             'created_subject' => $request->post('created_subject'),
+            'mail_verified' => $request->post('mail_verified'),
+            'mail_verified_subject' => $request->post('mail_verified_subject'),
         ]);
 
 
@@ -197,7 +199,7 @@ class MailController extends Controller
      */
     public function destroy(string $locale, $id)
     {
-        Session::query()->where('user_id',$id)->delete();
+        Session::query()->where('user_id', $id)->delete();
         return redirect(locale_route('session.index'))->with('success', __('admin.delete_message'));
     }
 

@@ -31,13 +31,8 @@ class Mail extends Model
         'status_approve_subject',
         'status_reject_subject',
         'verified_subject',
-        'created_subject'
+        'created_subject',
+        'mail_verified',
+        'mail_verified_subject'
     ];
-
-
-
-
-
-
-
 }

@@ -38,6 +38,7 @@ class File extends Model
     public const NATIONAL_ID = 5;
     public const BANK_STATEMENT = 6;
     public const SELFIE_WITH_DOCUMENT = 7;
+    public const NATIONAL_ID_BACK = 8;
 
     /**
      * The table associated with the model.

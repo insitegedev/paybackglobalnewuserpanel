@@ -24,14 +24,12 @@
 @section('content')
 
     <!-- breadcrumb -->
-    {{-- <div class="breadcrumb-header justify-content-between">
+    <div class="breadcrumb-header justify-content-between">
         <div class="left-content">
             <span class="main-content-title mg-b-0 mg-b-lg-1">T{{ __('admin.setting-update') }}</span>
         </div>
-        <div class="justify-content-center mt-2">
-            @include('admin.nowa.views.layouts.components.breadcrump')
-        </div>
-    </div> --}}
+         
+    </div>
     <!-- /breadcrumb -->
 
     <!-- row -->
@@ -57,7 +55,7 @@
                                             if($loop->first) $active = 'active';
                                             ?>
 
-                                            <li><a href="#lang-{{$locale['locale']}}" class="nav-link {{$active}}" data-bs-toggle="tab">{{$locale['locale']}}</a></li>
+                                            <li><a href="#lang-{{$locale}}" class="nav-link {{$active}}" data-bs-toggle="tab">{{$locale}}</a></li>
                                         @endforeach
 
                                     </ul>
@@ -67,17 +65,17 @@
                                 <div class="tab-content">
 
                                     @foreach(config('translatable.locales') as $locale)
+
                                         <?php
                                         $active = '';
                                         if($loop->first) $active = 'active';
                                         ?>
-                                        {{-- @dd($locale['locale']) --}}
-                                        <div class="tab-pane {{$active}}" id="lang-{{$locale['locale']}}">
+                                        <div class="tab-pane {{$active}}" id="lang-{{$locale}}">
                                             <div class="form-group">
-                                                {!! Form::label($locale['locale'].'[value]',__('admin.value')) !!}
-                                                {!! Form::text($locale['locale'].'[value]',$setting->translate($locale['locale'])->value ?? '',['class' => 'form-control']) !!}
+                                                {!! Form::label($locale.'[value]',__('admin.value')) !!}
+                                                {!! Form::text($locale.'[value]',$setting->translate($locale)->value ?? '',['class' => 'form-control']) !!}
 
-                                                @error($locale['locale'].'value')
+                                                @error($locale.'.value')
                                                 <small class="text-danger">
                                                     <div class="error">
                                                         {{$message}}

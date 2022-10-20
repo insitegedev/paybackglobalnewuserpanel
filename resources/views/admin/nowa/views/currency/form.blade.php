@@ -31,7 +31,7 @@
         <div class="left-content">
             <span class="main-content-title mg-b-0 mg-b-lg-1">{{$model ? __('admin.token_sale_update') : __('admin.token_sale_create')}}</span>
         </div>
-         
+
     </div>
     <!-- /breadcrumb -->
     <input name="old-images[]" id="old_images" hidden disabled value="{{$model->files}}">
@@ -82,7 +82,23 @@
     </div>
 
     <!-- row -->
-
+    <div class="row">
+        <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div>
+                        <h6 class="card-title mb-1">@lang('admin.image')</h6>
+                    </div>
+                    <div class="input-images"></div>
+                    @if ($errors->has('images'))
+                        <span class="help-block">
+                                            {{ $errors->first('images') }}
+                                        </span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- row closed -->
     {!! Form::close() !!}
 

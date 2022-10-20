@@ -16,7 +16,7 @@ class UpdateUsersVerificationTable extends Migration
         //
         Schema::table('users', function (Blueprint $table) {
             // $table->bigInteger('deleted_by')->nullable();
-            $table->string('verification_proggress');
+            $table->string('verification_proggress')->nullable();
         });
     }
 

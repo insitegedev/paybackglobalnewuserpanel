@@ -8,6 +8,7 @@ use App\Http\Requests\PasswordChangeRequest;
 use App\Http\Requests\UploadDocumentRequest;
 use App\Models\File;
 use App\Models\User;
+use App\Models\Withdrawal;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -31,21 +32,18 @@ class UserController extends Controller
         //            $allert=$request->session()->get('fail', null);
         //        }
 
-        $user = User::where("id", Auth::id())->with([
-            "files",
-            "profile",
-            'balances',
-            'balances.currency',
-            'wallets',
-            'wallets.currency',
-        ])->firstOrFail();
+
+        //\auth()->logout();
         // dd($user);
-        return \Inertia\Inertia::render("account/Account", ["account" => $user]);
+        return \Inertia\Inertia::render("Dashbord", [
+            "message" => $request->session()->get('message'),
+        ]);
     }
 
     public function changePasswordView(string $locale, Request $request)
     {
-        return view('client.pages.dashboard.change-password');
+
+        return \Inertia\Inertia::render("ChangePassword");
     }
 
     public function changePassword(PasswordChangeRequest $request)
@@ -114,30 +112,68 @@ class UserController extends Controller
 
     public function uploadDocuments(UploadDocumentRequest $request)
     {
-        // dd($request->file(), $request->document_type);
+        // dd($request->file(), $request['user_document_type']);
+        // dd($request->all());
         DB::beginTransaction();
 
-        if (!$request['document'] && !$request['bank_statement'] && !$request['selfie_with_document']) {
+        if (!$request['user_document'] && !$request['user_bank_statement'] && !$request['user_selfie_with_document']) {
             return redirect(locale_route('client.account.index'));
         }
         try {
 
-            if ($request->hasFile('document')) {
-                $this->saveFile($request->file('document'), $request['document_type'], File::NATIONAL_ID);
+            if ($request->hasFile('user_document')) {
+                $this->saveFile($request->file('user_document'), $request['user_document_type'], File::NATIONAL_ID);
             }
 
-            if ($request->hasFile('bank_statement')) {
-                $this->saveFile($request->file('bank_statement'), File::BANK_STATEMENT);
+            if ($request->hasFile('user_bank_statement')) {
+                $this->saveFile($request->file('user_bank_statement'), File::BANK_STATEMENT);
             }
 
-            if ($request->hasFile('selfie_with_document')) {
-                $this->saveFile($request->file('selfie_with_document'), File::SELFIE_WITH_DOCUMENT);
+            if ($request->hasFile('user_selfie_with_document')) {
+                $this->saveFile($request->file('user_selfie_with_document'), File::SELFIE_WITH_DOCUMENT);
             }
 
             DB::commit();
             return redirect(locale_route('client.account.index'))->with('success', __('client.document_success_upload'));
         } catch (\Exception $exception) {
             DB::rollBack();
+            return redirect(locale_route('client.account.index'))->with('fail', __('client.document_fail_upload'));
+        }
+    }
+
+    public function uploadDocuments2(Request $request)
+    {
+        //dd($request->all());
+
+        DB::beginTransaction();
+
+        if (!$request['passport'] && !$request['id_front'] && !$request['id_back'] && !$request['driver_license']) {
+            return redirect()->back()->with('error', 'choose file');
+        }
+        try {
+
+            if ($request->hasFile('passport')) {
+                $this->saveFile($request->file('passport'), File::PASSPORT);
+            }
+
+            if ($request->hasFile('id_front')) {
+                $this->saveFile($request->file('id_front'), File::NATIONAL_ID);
+            }
+
+            if ($request->hasFile('id_back')) {
+                $this->saveFile($request->file('id_back'), File::NATIONAL_ID_BACK);
+            }
+
+            if ($request->hasFile('driver_license')) {
+                $this->saveFile($request->file('driver_license'), File::DRIVER_LICENSE);
+            }
+
+            DB::commit();
+            return redirect()->route('client.kyc')->with('success', __('client.document_success_upload'));
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+            dd($exception->getMessage());
             return redirect(locale_route('client.account.index'))->with('fail', __('client.document_fail_upload'));
         }
     }
@@ -154,5 +190,82 @@ class UserController extends Controller
             'format' => $file->getClientOriginalExtension(),
             'type' => $type
         ]);
+    }
+
+    private function checkKyc()
+    {
+        // dd(Auth::user()->verification_status == 'verified');
+        $customer = \auth()->user();
+        //dd(count($customer->files));
+        if (count($customer->files) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function transactions()
+    {
+        return \Inertia\Inertia::render("Transactions");
+    }
+
+    public function kyc()
+    {
+        if ($this->checkKyc()) {
+            return \Inertia\Inertia::render("KYCStatus");
+        }
+        return \Inertia\Inertia::render("KYC");
+    }
+
+    public function kycApp(Request $request)
+    {
+        if ($this->checkKyc()) {
+            return \Inertia\Inertia::render("KYCStatus");
+        }
+        return \Inertia\Inertia::render("KYCApp");
+    }
+
+    public function kycAppp(Request $request)
+    {
+        return \Inertia\Inertia::render("KYCApp");
+    }
+
+    public function kycStatus()
+    {
+        return \Inertia\Inertia::render("KYCStatus");
+    }
+
+    public function account(Request $request)
+    {
+        return \Inertia\Inertia::render("Account", [
+            'success' => $request->session()->get('success'),
+            "message" => $request->session()->get('message'),
+        ]);
+    }
+
+    public function security(Request $request)
+    {
+        return \Inertia\Inertia::render("Security", ['image' => $request->session()->get('image')]);
+    }
+
+    public function activity()
+    {
+        return \Inertia\Inertia::render("Activity");
+    }
+
+    public function policy()
+    {
+        return \Inertia\Inertia::render("Policy");
+    }
+
+    public function faq()
+    {
+        return \Inertia\Inertia::render("FAQ");
+    }
+
+
+    public function saveActivity(Request $request)
+    {
+        User::query()->where('id', \auth()->id())->update(['save_activity' => $request->post('val')]);
+        return redirect()->back();
     }
 }

@@ -70,7 +70,7 @@
             });
 
             const theme = localStorage.getItem('admin_theme');
-            if(theme == 'dark'){
+            if(theme === 'dark'){
                 $('body').addClass('dark-theme')
             }
         </script>

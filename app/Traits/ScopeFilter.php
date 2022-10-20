@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  app/Traits/ScopeFilter.php
  *
@@ -56,7 +57,7 @@ trait ScopeFilter
         $activeFilters = [];
         foreach ($this->getFilterScopes() as $key => $value) {
             if ($request->filled($key)) {
-                $activeFilters [$key] = $request->{$key};
+                $activeFilters[$key] = $request->{$key};
             }
         }
         return $activeFilters;
@@ -93,6 +94,14 @@ trait ScopeFilter
     public function scopeName($query, $name)
     {
         return $query->where('name', 'like', '%' . $name . '%');
+    }
+    public function scopePhone($query, $name)
+    {
+        // return $query->whereHas('phone', 'like', '%' . $name . '%');
+
+        return $query->whereHas('profile', function ($query) use ($name) {
+            return $query->where('phone', 'like', '%' . $name . '%');
+        });
     }
 
     /**
@@ -185,6 +194,10 @@ trait ScopeFilter
     public function scopeText($query, $text)
     {
         return $query->where('text', 'like', '%' . $text . '%');
+    }
+    public function scopeUnique_id($query, $unique_id)
+    {
+        return $query->where('unique_id', 'like', '%' . $unique_id . '%');
     }
 
     /**
